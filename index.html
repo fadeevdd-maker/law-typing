@@ -94,7 +94,20 @@ select:focus,input:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .kb{display:flex;flex-direction:column;gap:4px;user-select:none}
 .kb .r{display:flex;gap:4px}
 .kb .k{flex:1 1 0;min-width:0;height:38px;border-radius:6px;background:var(--f8);display:flex;align-items:center;justify-content:center;font:500 14px var(--ui-font);color:var(--ink);position:relative;transition:transform .06s}
-.kb .k.sp{visibility:hidden}
+.kb .k.mod{background:transparent;border:1px solid var(--line)}
+.kb .k .dual{display:flex;flex-direction:column;align-items:center;line-height:1.05}
+.kb .k .dual small{font-size:10px;color:var(--muted)}
+dialog{border:0;border-radius:16px;padding:20px;width:min(760px,calc(100% - 32px));max-height:calc(100% - 32px);background:var(--panel);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h3{margin:14px 0 6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;background:var(--panel);color:var(--ink);font:inherit}
+.opt b{display:block;font-weight:600}
+.opt span{display:block;font-size:13px;color:var(--muted)}
+.opt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.probe{margin-top:8px;font-size:14px;background:var(--panel-2);border-radius:8px;padding:8px 12px}
+.kbbtn{white-space:nowrap}
+@media (max-width:560px){.opts{grid-template-columns:1fr}}
 .kb .k small{font-size:10px;color:var(--muted)}
 .kb .k.home::after{content:"";position:absolute;bottom:5px;width:10px;height:2px;border-radius:1px;background:var(--muted)}
 .kb .k.next{outline:3px solid var(--accent);outline-offset:-1px;transform:translateY(-1px);font-weight:700}
@@ -176,6 +189,7 @@ footer a{color:var(--muted)}
     <button data-v="stats">Прогресс</button>
     <button data-v="own">Свои материалы</button>
   </nav>
+  <button class="btn small kbbtn" id="kbBtn" title="Настройка клавиатуры">⌨ <span id="kbBtnTxt"></span></button>
   <div class="today"><span id="todayTxt">Сегодня 0 / 15 мин</span><div class="bar"><i id="todayBar"></i></div></div>
 </header>
 
@@ -241,7 +255,7 @@ footer a{color:var(--muted)}
       <p>Указательные пальцы лежат на клавишах с засечками: в русской раскладке это <code>А</code> и <code>О</code>, в английской <code>F</code> и <code>J</code>. Остальные пальцы ложатся рядом: <code>Ф Ы В А</code> — левая рука, <code>О Л Д Ж</code> — правая. Большие пальцы на пробеле.</p>
       <p>Цвет клавиши на схеме показывает палец, который её нажимает. Следующая клавиша обведена, под клавиатурой написано, каким пальцем её жать. На клавиатуру не смотри, смотри на схему на экране.</p>
       <p>Сначала точность, потом скорость. Ошибка не пропускается: пока не нажмёшь правильную клавишу, курсор стоит. Цель на первые недели — точность выше 95%. Скорость придёт сама.</p>
-      <p>Кавычки «ёлочки» можно печатать обычными <code>"</code>, длинное тире — дефисом <code>-</code>, букву <code>ё</code> — как <code>е</code>. Абзац — <code>Enter</code> или пробел.</p>
+      <p>Если схема на экране не совпадает с твоей клавиатурой, нажми кнопку ⌨ вверху и выбери свою. Кавычки «ёлочки» можно печатать обычными <code>"</code>, длинное тире — дефисом <code>-</code>, букву <code>ё</code> — как <code>е</code>. Абзац — <code>Enter</code> или пробел.</p>
       <p>Хороший ритм: 15–20 минут в день. Сначала 2–3 статьи в режиме «Переписывание», потом одна «По памяти», в конце 5 минут «Слабых букв».</p>
     </div>
   </details>
@@ -324,6 +338,29 @@ footer a{color:var(--muted)}
     <span style="flex:1"></span><button class="btn small" id="themeBtn">Тема: авто</button></div>
   </div>
 </section>
+<dialog id="kbDlg">
+  <h2>Настроим клавиатуру под тебя</h2>
+  <p class="muted small" style="margin:0">Сравни схему внизу с клавиатурой перед тобой. Если совпадает — жми «Готово». Поменять можно в любой момент кнопкой ⌨ вверху страницы.</p>
+  <h3>Компьютер</h3>
+  <div class="opts" id="kbOs">
+    <button class="opt" data-v="mac"><b>Mac</b><span>MacBook, iMac, Magic Keyboard</span></button>
+    <button class="opt" data-v="win"><b>Windows или Linux</b><span>обычный ноутбук или ПК</span></button>
+  </div>
+  <h3>Русская раскладка</h3>
+  <div class="opts" id="kbRu">
+    <button class="opt" data-v="mac"><b>Русская (стандартная на Mac)</b><span>точка — Shift + 7, запятая — Shift + 6, Ё справа вверху</span></button>
+    <button class="opt" data-v="pc"><b>Русская – ПК</b><span>точка и запятая — клавиша справа от Ю, Ё слева от 1</span></button>
+  </div>
+  <div class="probe" id="kbProbe"></div>
+  <h3>Форма клавиатуры</h3>
+  <div class="opts" id="kbShape">
+    <button class="opt" data-v="ansi"><b>Enter в одну строку</b><span>ANSI: длинный левый Shift, сразу за ним Z (Я)</span></button>
+    <button class="opt" data-v="iso"><b>Enter буквой «Г»</b><span>ISO: между левым Shift и Z (Я) есть ещё клавиша</span></button>
+  </div>
+  <h3>Схема, которую будет показывать тренажёр</h3>
+  <div class="kb fingers" id="kbPreview"></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn primary" id="kbDone">Готово</button></div>
+</dialog>
 <footer>
   <span>Тексты: Конституция РФ, главы 1–2 (не изменялись поправками 2020 года) и английский перевод.</span>
   <span>Прогресс хранится только в твоём браузере.</span>
@@ -410,63 +447,165 @@ function cardDecks(){
 }
 
 /* ---------- раскладки и пальцы ---------- */
-const ROWS = [
-  ['Backquote','Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8','Digit9','Digit0','Minus','Equal',['Backspace',2,'⌫']],
-  [['Tab',1.5,'Tab'],'KeyQ','KeyW','KeyE','KeyR','KeyT','KeyY','KeyU','KeyI','KeyO','KeyP','BracketLeft','BracketRight',['Backslash',1.5]],
-  [['CapsLock',1.8,'Caps'],'KeyA','KeyS','KeyD','KeyF','KeyG','KeyH','KeyJ','KeyK','KeyL','Semicolon','Quote',['Enter',2.2,'Enter']],
-  [['ShiftLeft',2.4,'Shift'],'KeyZ','KeyX','KeyC','KeyV','KeyB','KeyN','KeyM','Comma','Period','Slash',['ShiftRight',2.6,'Shift']],
-  [['_a',4.5],['Space',6,'пробел'],['_b',4.5]]
-];
-const LAYOUT = {
-  ru:{Backquote:'ёЁ',Digit1:'1!',Digit2:'2"',Digit3:'3№',Digit4:'4;',Digit5:'5%',Digit6:'6:',Digit7:'7?',Digit8:'8*',Digit9:'9(',Digit0:'0)',Minus:'-_',Equal:'=+',
-    KeyQ:'йЙ',KeyW:'цЦ',KeyE:'уУ',KeyR:'кК',KeyT:'еЕ',KeyY:'нН',KeyU:'гГ',KeyI:'шШ',KeyO:'щЩ',KeyP:'зЗ',BracketLeft:'хХ',BracketRight:'ъЪ',Backslash:'\\/',
-    KeyA:'фФ',KeyS:'ыЫ',KeyD:'вВ',KeyF:'аА',KeyG:'пП',KeyH:'рР',KeyJ:'оО',KeyK:'лЛ',KeyL:'дД',Semicolon:'жЖ',Quote:'эЭ',
-    KeyZ:'яЯ',KeyX:'чЧ',KeyC:'сС',KeyV:'мМ',KeyB:'иИ',KeyN:'тТ',KeyM:'ьЬ',Comma:'бБ',Period:'юЮ',Slash:'.,'},
-  en:{Backquote:'`~',Digit1:'1!',Digit2:'2@',Digit3:'3#',Digit4:'4$',Digit5:'5%',Digit6:'6^',Digit7:'7&',Digit8:'8*',Digit9:'9(',Digit0:'0)',Minus:'-_',Equal:'=+',
-    KeyQ:'qQ',KeyW:'wW',KeyE:'eE',KeyR:'rR',KeyT:'tT',KeyY:'yY',KeyU:'uU',KeyI:'iI',KeyO:'oO',KeyP:'pP',BracketLeft:'[{',BracketRight:']}',Backslash:'\\|',
-    KeyA:'aA',KeyS:'sS',KeyD:'dD',KeyF:'fF',KeyG:'gG',KeyH:'hH',KeyJ:'jJ',KeyK:'kK',KeyL:'lL',Semicolon:';:',Quote:'\'"',
-    KeyZ:'zZ',KeyX:'xX',KeyC:'cC',KeyV:'vV',KeyB:'bB',KeyN:'nN',KeyM:'mM',Comma:',<',Period:'.>',Slash:'/?'}
-};
-const DEF = {ru:{}, en:{}};
-for (const l of ['ru','en']) for (const [code, pair] of Object.entries(LAYOUT[l])) {
-  if (!(pair[0] in DEF[l])) DEF[l][pair[0]] = {c:code, s:false};
-  if (!(pair[1] in DEF[l])) DEF[l][pair[1]] = {c:code, s:true};
+// Клавиатуры бывают разные: система (Mac / Windows), вариант русской раскладки и форма
+// (ANSI — Enter в одну строку, ISO — Enter буквой «Г» и лишняя клавиша слева от Z).
+const IS_MAC = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
+function kbConf(){ return S.kb || {os: IS_MAC ? 'mac' : 'win', ru: IS_MAC ? 'mac' : 'pc', shape: 'ansi', done: false}; }
+// macOS отдаёт коды клавиш «слева от 1» и «слева от Z» на ISO-клавиатурах наоборот
+const isoCodes = os => os === 'mac' ? {k1:'IntlBackslash', kz:'Backquote'} : {k1:'Backquote', kz:'IntlBackslash'};
+const DIGITS = ['Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8','Digit9','Digit0','Minus','Equal'];
+function rowsFor(cf){
+  const mac = cf.os === 'mac', iso = isoCodes(cf.os);
+  const L = mac ? {bs:'delete', tab:'tab', caps:'caps lock', ent:'return', sh:'shift'} : {bs:'Backspace', tab:'Tab', caps:'Caps Lock', ent:'Enter', sh:'Shift'};
+  const top = ['KeyQ','KeyW','KeyE','KeyR','KeyT','KeyY','KeyU','KeyI','KeyO','KeyP','BracketLeft','BracketRight'];
+  const mid = ['KeyA','KeyS','KeyD','KeyF','KeyG','KeyH','KeyJ','KeyK','KeyL','Semicolon','Quote'];
+  const low = ['KeyZ','KeyX','KeyC','KeyV','KeyB','KeyN','KeyM','Comma','Period','Slash'];
+  const bottom = mac
+    ? [['_fn',1,'fn'],['_ctl',1.1,'control'],['_opt',1.1,'option'],['_cmd',1.4,'command'],['Space',5.8,''],['_cmd2',1.4,'command'],['_opt2',1.1,'option'],['_arr',2.1,'← ↑↓ →']]
+    : [['_ctl',1.4,'Ctrl'],['_fn',1.1,'Fn'],['_win',1.1,'Win'],['_alt',1.3,'Alt'],['Space',6.3,''],['_alt2',1.3,'Alt'],['_ctl2',1.4,'Ctrl'],['_arr',2.1,'← ↑↓ →']];
+  return cf.shape === 'iso' ? [
+    [iso.k1, ...DIGITS, ['Backspace',2,L.bs]],
+    [['Tab',1.5,L.tab], ...top, ['Enter',1.5,L.ent]],
+    [['CapsLock',1.8,L.caps], ...mid, 'Backslash', ['Enter',1.2,'']],
+    [['ShiftLeft',1.3,L.sh], iso.kz, ...low, ['ShiftRight',2.7,L.sh]],
+    bottom
+  ] : [
+    ['Backquote', ...DIGITS, ['Backspace',2,L.bs]],
+    [['Tab',1.5,L.tab], ...top, ['Backslash',1.5]],
+    [['CapsLock',1.8,L.caps], ...mid, ['Enter',2.2,L.ent]],
+    [['ShiftLeft',2.4,L.sh], ...low, ['ShiftRight',2.6,L.sh]],
+    bottom
+  ];
+}
+const RU_LETTERS = {KeyQ:'йЙ',KeyW:'цЦ',KeyE:'уУ',KeyR:'кК',KeyT:'еЕ',KeyY:'нН',KeyU:'гГ',KeyI:'шШ',KeyO:'щЩ',KeyP:'зЗ',BracketLeft:'хХ',BracketRight:'ъЪ',
+  KeyA:'фФ',KeyS:'ыЫ',KeyD:'вВ',KeyF:'аА',KeyG:'пП',KeyH:'рР',KeyJ:'оО',KeyK:'лЛ',KeyL:'дД',Semicolon:'жЖ',Quote:'эЭ',
+  KeyZ:'яЯ',KeyX:'чЧ',KeyC:'сС',KeyV:'мМ',KeyB:'иИ',KeyN:'тТ',KeyM:'ьЬ',Comma:'бБ',Period:'юЮ'};
+const EN_US = {Backquote:'`~',Digit1:'1!',Digit2:'2@',Digit3:'3#',Digit4:'4$',Digit5:'5%',Digit6:'6^',Digit7:'7&',Digit8:'8*',Digit9:'9(',Digit0:'0)',Minus:'-_',Equal:'=+',
+  KeyQ:'qQ',KeyW:'wW',KeyE:'eE',KeyR:'rR',KeyT:'tT',KeyY:'yY',KeyU:'uU',KeyI:'iI',KeyO:'oO',KeyP:'pP',BracketLeft:'[{',BracketRight:']}',Backslash:'\\|',
+  KeyA:'aA',KeyS:'sS',KeyD:'dD',KeyF:'fF',KeyG:'gG',KeyH:'hH',KeyJ:'jJ',KeyK:'kK',KeyL:'lL',Semicolon:';:',Quote:'\'"',
+  KeyZ:'zZ',KeyX:'xX',KeyC:'cC',KeyV:'vV',KeyB:'bB',KeyN:'nN',KeyM:'mM',Comma:',<',Period:'.>',Slash:'/?'};
+function layoutFor(cf){
+  const iso = isoCodes(cf.os), en = {...EN_US};
+  let ru;
+  if (cf.ru === 'mac') {
+    // стандартная «Русская» на Mac: знаки препинания на цифрах с Shift, Ё справа вверху
+    ru = {...RU_LETTERS, Digit1:'1!',Digit2:'2"',Digit3:'3№',Digit4:'4%',Digit5:'5:',Digit6:'6,',Digit7:'7.',Digit8:'8;',Digit9:'9(',Digit0:'0)',Minus:'-_',Equal:'=+',
+          Slash:'/?', Backslash:'ёЁ', Backquote:']['};
+    if (cf.shape === 'iso') { ru[iso.k1] = '><'; ru[iso.kz] = ']['; }
+  } else {
+    // «Русская – ПК» (как в Windows): точка и запятая справа от Ю, Ё слева от 1
+    ru = {...RU_LETTERS, Digit1:'1!',Digit2:'2"',Digit3:'3№',Digit4:'4;',Digit5:'5%',Digit6:'6:',Digit7:'7?',Digit8:'8*',Digit9:'9(',Digit0:'0)',Minus:'-_',Equal:'=+',
+          Slash:'.,', Backslash:'\\/', Backquote:'ёЁ'};
+    if (cf.shape === 'iso') { ru[iso.k1] = 'ёЁ'; ru[iso.kz] = '\\/'; }
+  }
+  if (cf.shape === 'iso') { en[iso.k1] = cf.os === 'mac' ? '§±' : '`~'; en[iso.kz] = cf.os === 'mac' ? '`~' : '\\|'; }
+  return {ru, en};
+}
+let CF, LAY, ROWS, DEF;
+function rebuildLayout(){
+  CF = kbConf(); LAY = layoutFor(CF); ROWS = rowsFor(CF); DEF = {ru:{}, en:{}};
+  for (const l of ['ru','en']) for (const [code, pair] of Object.entries(LAY[l])) {
+    const [a, b] = [...pair];
+    if (!(a in DEF[l])) DEF[l][a] = {c:code, s:false};
+    if (!(b in DEF[l])) DEF[l][b] = {c:code, s:true};
+  }
 }
 const FINGER = {};
-[['Backquote Digit1 KeyQ KeyA KeyZ ShiftLeft Tab CapsLock',0],['Digit2 KeyW KeyS KeyX',1],['Digit3 KeyE KeyD KeyC',2],
+[['Backquote IntlBackslash Digit1 KeyQ KeyA KeyZ ShiftLeft Tab CapsLock',0],['Digit2 KeyW KeyS KeyX',1],['Digit3 KeyE KeyD KeyC',2],
  ['Digit4 Digit5 KeyR KeyT KeyF KeyG KeyV KeyB',3],['Digit6 Digit7 KeyY KeyU KeyH KeyJ KeyN KeyM',4],['Digit8 KeyI KeyK Comma',5],
  ['Digit9 KeyO KeyL Period',6],['Digit0 Minus Equal KeyP BracketLeft BracketRight Backslash Semicolon Quote Slash Enter ShiftRight Backspace',7],['Space',8]]
  .forEach(([codes,f]) => codes.split(' ').forEach(c => FINGER[c] = f));
 const FNAME = ['левый мизинец','левый безымянный','левый средний','левый указательный','правый указательный','правый средний','правый безымянный','правый мизинец','большой палец'];
 const LEFT = c => FINGER[c] !== undefined && FINGER[c] <= 3;
+const QUOTES = {'«':'"','»':'"','“':'"','”':'"','„':'"','—':'-','–':'-'};
 
 function keyFor(ch, lang){
   if (ch === '\n') return {c:'Enter', s:false};
   if (ch === ' ') return {c:'Space', s:false};
-  if (S.learned[ch]) return S.learned[ch];
-  const n = {'«':'"','»':'"','“':'"','”':'"','„':'"','—':'-','–':'-'}[ch] || ch;
-  if (S.learned[n]) return S.learned[n];
-  return DEF[lang][n] || DEF.ru[n] || DEF.en[n] || null;
+  const n = QUOTES[ch] || ch, L = (S.learned2 && S.learned2[lang]) || {};
+  return L[ch] || L[n] || DEF[lang][ch] || DEF[lang][n] || DEF[lang === 'ru' ? 'en' : 'ru'][n] || null;
 }
+// Запоминаем, где на самом деле нажалась правильная клавиша: так схема подстраивается под нестандартные раскладки
 let learnDirty = false;
-function learn(e){
-  if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1 || FINGER[e.code] === undefined || e.code === 'Space') return;
-  const cur = S.learned[e.key];
-  if (!cur || cur.c !== e.code || cur.s !== e.shiftKey) { S.learned[e.key] = {c:e.code, s:e.shiftKey}; learnDirty = true; }
+function learnKey(lang, ch, e){
+  if (!e || FINGER[e.code] === undefined || e.code === 'Space' || ch.length !== 1) return;
+  const L = (S.learned2 || (S.learned2 = {ru:{}, en:{}}))[lang] || (S.learned2[lang] = {});
+  const d = DEF[lang][ch], cur = L[ch];
+  if (d && d.c === e.code && d.s === e.shiftKey) { if (cur) { delete L[ch]; learnDirty = true; } return; }
+  if (!cur || cur.c !== e.code || cur.s !== e.shiftKey) { L[ch] = {c:e.code, s:e.shiftKey}; learnDirty = true; }
 }
-function labelFor(code, lang){
-  for (const [ch, k] of Object.entries(S.learned)) if (k.c === code && !k.s && (lang==='ru' ? isCyr(ch) : isLat(ch))) return ch;
-  const p = LAYOUT[lang][code]; return p ? p[0] : '';
+function keyLabel(code, lang){
+  if (code === 'Enter') return CF.os === 'mac' ? 'return' : 'Enter';
+  if (code === 'Space') return 'пробел';
+  const p = LAY[lang][code]; if (!p) return code;
+  const a = [...p][0]; return /\p{L}/u.test(a) ? a.toUpperCase() : a;
+}
+function keyFace(code, lang){
+  const p = LAY[lang][code]; if (!p) return '';
+  const [a, b] = [...p];
+  if (/\p{L}/u.test(a) && b === a.toUpperCase()) return esc(b);
+  return `<span class="dual"><small>${esc(b)}</small>${esc(a)}</span>`;
 }
 function buildKb(el, lang){
   el.innerHTML = ROWS.map(r => '<div class="r">' + r.map(k => {
     const [code, w, lab] = Array.isArray(k) ? k : [k, 1];
-    if (code[0] === '_') return `<div class="k sp" style="flex-grow:${w}"></div>`;
-    const t = lab !== undefined ? `<small>${lab}</small>` : esc(labelFor(code, lang).toUpperCase());
+    if (code[0] === '_') return `<div class="k mod" style="flex-grow:${w}"><small>${lab}</small></div>`;
+    const t = lab !== undefined ? `<small>${lab}</small>` : keyFace(code, lang);
     const home = (code==='KeyF'||code==='KeyJ') ? ' home' : '';
     return `<div class="k${home}" data-c="${code}" data-f="${FINGER[code] ?? 8}" style="flex-grow:${w}">${t}</div>`;
   }).join('') + '</div>').join('');
 }
+function kbSummary(cf){ return (cf.os === 'mac' ? 'Mac' : 'Windows') + ' · ' + (cf.ru === 'mac' ? 'Русская' : 'Русская – ПК') + ' · ' + cf.shape.toUpperCase(); }
+
+/* ---------- мастер настройки клавиатуры ---------- */
+let KD = null;
+function openKbSetup(){
+  KD = {...kbConf()};
+  if (navigator.keyboard && navigator.keyboard.getLayoutMap && !S.kb) {
+    // Chrome умеет отдать текущую раскладку: если сейчас включена русская, вариант определится сам
+    navigator.keyboard.getLayoutMap().then(m => {
+      const s = m.get('Slash'), f = m.get('KeyF');
+      if (f === 'а') { KD.ru = s === '.' ? 'pc' : 'mac'; renderKbSetup(); $('kbProbe').innerHTML = '✓ Раскладку определил автоматически: <b>' + (KD.ru === 'mac' ? 'Русская (Mac)' : 'Русская – ПК') + '</b>'; }
+    }).catch(() => {});
+  }
+  $('kbProbe').innerHTML = 'Не уверен? Включи русскую раскладку и нажми на клавиатуре <b>точку</b> — определю сам.';
+  renderKbSetup();
+  $('kbDlg').showModal();
+}
+function renderKbSetup(){
+  for (const [id, key] of [['kbOs','os'],['kbRu','ru'],['kbShape','shape']])
+    $(id).querySelectorAll('.opt').forEach(b => b.classList.toggle('on', b.dataset.v === KD[key]));
+  const saved = S.kb; S.kb = KD; rebuildLayout(); buildKb($('kbPreview'), 'ru'); S.kb = saved; rebuildLayout();
+}
+for (const [id, key] of [['kbOs','os'],['kbRu','ru'],['kbShape','shape']]) {
+  $(id).onclick = e => {
+    const b = e.target.closest('.opt'); if (!b) return;
+    KD[key] = b.dataset.v;
+    if (key === 'os') KD.ru = KD.os === 'mac' ? 'mac' : 'pc';
+    renderKbSetup();
+  };
+}
+$('kbDlg').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'Tab') return;
+  e.preventDefault();
+  const p = $('kbProbe');
+  if (e.key === '.' || e.key === ',') {
+    if (e.code === 'Slash') { KD.ru = 'pc'; p.innerHTML = '✓ Понял: у тебя <b>Русская – ПК</b> — точка справа от Ю.'; }
+    else if (e.code === 'Digit7' || e.code === 'Digit6') { KD.ru = 'mac'; p.innerHTML = '✓ Понял: у тебя <b>Русская (Mac)</b> — точка на Shift + 7.'; }
+    else if (e.code === 'Period' || e.code === 'Comma') { p.innerHTML = 'Сейчас включена английская раскладка. Переключи на русскую ' + (KD.os === 'mac' ? '(клавиша 🌐 или Ctrl + пробел)' : '(Alt + Shift или Win + пробел)') + ' и нажми точку ещё раз.'; }
+    renderKbSetup();
+  } else if (e.key.length === 1) {
+    p.innerHTML = isLat(e.key) ? 'Сейчас включена английская раскладка. Переключи на русскую и нажми <b>точку</b>.'
+                               : 'Нажми именно <b>точку</b> в русской раскладке — так я пойму, где она у тебя.';
+  }
+});
+$('kbDone').onclick = () => {
+  S.kb = {...KD, done:true}; S.learned2 = {ru:{}, en:{}}; save();
+  $('kbDlg').close(); rebuildLayout(); $('kbBtnTxt').textContent = kbSummary(CF);
+  restart();
+};
+$('kbBtn').onclick = openKbSetup;
+rebuildLayout();
 
 /* ---------- навигация ---------- */
 let view = 'type';
@@ -549,7 +688,7 @@ function accept(exp, got){
   if (exp === '\n' && got === ' ') return true;
   return nch(exp) === nch(got);
 }
-function onType(k){
+function onType(k, e){
   const now = performance.now();
   if (!T.started) { T.started = now; T.last = now; }
   T.active += Math.min(now - T.last, 3000); T.last = now;
@@ -557,6 +696,7 @@ function onType(k){
   if (accept(exp, k)) {
     hideWarn();
     recordKey(T.lang, exp, T.erred.has(T.pos));
+    if (k !== '\n' && k === exp) learnKey(T.lang, k, e);
     spans[T.pos].classList.remove('cur','bad');
     spans[T.pos].classList.add(T.erred.has(T.pos) ? 'fix' : 'ok');
     T.pos++;
@@ -569,8 +709,8 @@ function onType(k){
     T.errs++; T.erred.add(T.pos);
     const key = nch(exp).toLowerCase(); T.miss[key] = (T.miss[key] || 0) + 1;
     spans[T.pos].classList.add('bad');
-    const kf = keyFor(exp, T.lang), el = kf && document.querySelector(`#kb [data-c="${kf.c}"]`);
-    if (el) { el.classList.add('hit'); setTimeout(() => el.classList.remove('hit'), 250); }
+    const kf = keyFor(exp, T.lang);
+    if (kf) document.querySelectorAll(`#kb [data-c="${kf.c}"]`).forEach(el => { el.classList.add('hit'); setTimeout(() => el.classList.remove('hit'), 250); });
   }
   updateLive(); highlightNext();
 }
@@ -594,16 +734,24 @@ function highlightNext(){
   if (!T || T.done) { $('fingerHint').textContent = ''; return; }
   const ch = T.text[T.pos], k = keyFor(ch, T.lang);
   if (!k) { $('fingerHint').textContent = ''; return; }
-  const el = document.querySelector(`#kb [data-c="${k.c}"]`); el && el.classList.add('next');
-  let shiftTxt = '';
-  if (k.s) { const sc = LEFT(k.c) ? 'ShiftRight' : 'ShiftLeft'; document.querySelector(`#kb [data-c="${sc}"]`).classList.add('next'); shiftTxt = ` + ${LEFT(k.c) ? 'правый' : 'левый'} Shift (мизинцем другой руки)`; }
-  const shown = ch === '\n' ? 'Enter' : ch === ' ' ? 'пробел' : '«' + ch + '»';
-  $('fingerHint').innerHTML = `Следующая: <b>${esc(shown)}</b> — ${FNAME[FINGER[k.c] ?? 8]}${shiftTxt}`;
+  document.querySelectorAll(`#kb [data-c="${k.c}"]`).forEach(el => el.classList.add('next'));
+  const shown = ch === '\n' ? (CF.os === 'mac' ? 'return' : 'Enter') : ch === ' ' ? 'пробел' : '«' + ch + '»';
+  const finger = FNAME[FINGER[k.c] ?? 8];
+  let txt;
+  if (k.s) {
+    const sc = LEFT(k.c) ? 'ShiftRight' : 'ShiftLeft';
+    document.querySelectorAll(`#kb [data-c="${sc}"]`).forEach(el => el.classList.add('next'));
+    txt = `Shift + ${esc(keyLabel(k.c, T.lang))}: клавишу — ${finger}, ${LEFT(k.c) ? 'правый' : 'левый'} Shift — мизинцем другой руки`;
+  } else {
+    const lab = keyLabel(k.c, T.lang);
+    txt = (lab.toLowerCase() !== ch.toLowerCase() && ch !== '\n' && ch !== ' ' ? `клавиша ${esc(lab)}, ` : '') + finger;
+  }
+  $('fingerHint').innerHTML = `Следующая: <b>${esc(shown)}</b> — ${txt}`;
 }
 function showWarn(needRu){
   const w = $('layoutWarn');
-  w.textContent = needRu ? 'Включена английская раскладка. Переключи на русскую (Ctrl + пробел или клавиша 🌐 / Fn) — ошибку не засчитываю.'
-                         : 'Включена русская раскладка. Переключи на английскую (Ctrl + пробел или клавиша 🌐 / Fn) — ошибку не засчитываю.';
+  const how = CF.os === 'mac' ? 'клавиша 🌐 (fn) или Ctrl + пробел' : 'Alt + Shift или Win + пробел';
+  w.textContent = (needRu ? 'Включена английская раскладка. Переключи на русскую' : 'Включена русская раскладка. Переключи на английскую') + ` (${how}) — ошибку не засчитываю.`;
   w.classList.add('show');
 }
 function hideWarn(){ $('layoutWarn').classList.remove('show'); }
@@ -734,14 +882,14 @@ $('memShow').onclick = () => memCheck(true);
 
 /* ---------- клавиатура: общий обработчик ---------- */
 document.addEventListener('keydown', e => {
-  learn(e);
+  if ($('kbDlg').open) return;
   if (view !== 'type' || S.sel.mode === 'memory' || !T) return;
   if (e.target.closest && e.target.closest('input,textarea,select')) return;
   if (e.metaKey || e.ctrlKey) return;
   if (T.done) { if (e.key === 'Enter') { e.preventDefault(); $('goOnBtn').click(); } return; }
   let k = e.key;
   if (k === 'Enter') k = '\n'; else if (k.length !== 1) return;
-  e.preventDefault(); onType(k);
+  e.preventDefault(); onType(k, e);
 });
 setInterval(() => { if (learnDirty) { learnDirty = false; save(); } }, 5000);
 
@@ -884,13 +1032,17 @@ function renderChart(ss){
 function renderHeat(){
   document.querySelectorAll('#heatSeg button').forEach(b => b.classList.toggle('on', b.dataset.l === heatLang));
   const kb = $('heatKb'); buildKb(kb, heatLang);
-  const m = S.keys[heatLang] || {};
+  const m = S.keys[heatLang] || {}, agg = {};
+  for (const [ch, r] of Object.entries(m)) {
+    const k = keyFor(ch, heatLang); if (!k) continue;
+    const a = agg[k.c] || (agg[k.c] = {n:0, e:0, chars:[]}); a.n += r[0]; a.e += r[1]; a.chars.push(ch);
+  }
   kb.querySelectorAll('.k[data-c]').forEach(el => {
-    const lab = labelFor(el.dataset.c, heatLang), r = m[lab];
-    if (!r || r[0] < 3) return;
-    const rate = r[1] / r[0];
+    const a = agg[el.dataset.c];
+    if (!a || a.n < 3) return;
+    const rate = a.e / a.n;
     el.style.background = `color-mix(in srgb, var(--bad) ${Math.round(Math.min(1, rate * 5) * 70)}%, var(--f8))`;
-    el.title = `${lab}: ошибка в ${Math.round(rate*100)}% нажатий (${r[0]} раз)`;
+    el.title = `${a.chars.join(' ')}: ошибка в ${Math.round(rate*100)}% нажатий (${a.n} раз)`;
   });
   const w = weakChars(heatLang, 8);
   $('heatList').innerHTML = w.length ? 'Чаще всего ошибаешься: ' + w.map(c => `<b>${esc(c)}</b> ${Math.round(100*m[c][1]/m[c][0])}%`).join(', ') + '. Режим «Слабые буквы» соберёт упражнение из них.'
@@ -968,8 +1120,10 @@ $('themeBtn').onclick = () => { S.theme = {auto:'light', light:'dark', dark:'aut
 /* ---------- старт ---------- */
 const TOUCH = matchMedia('(hover: none) and (pointer: coarse)').matches;
 function init(){
+  delete S.learned; rebuildLayout(); $('kbBtnTxt').textContent = kbSummary(CF);
   applyTheme(); fillDeckSel(); updateToday(); restart();
   if (TOUCH) { $('touchNote').classList.remove('hidden'); $('toCards').onclick = e => { e.preventDefault(); show('cards'); }; show('cards'); }
+  else if (!S.kb || !S.kb.done) openKbSetup();
 }
 init();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
