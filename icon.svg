@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<rect width="64" height="64" rx="14" fill="#7a2335"/>
+<rect x="9" y="11" width="46" height="46" rx="8" fill="#5c1626"/>
+<rect x="9" y="9" width="46" height="46" rx="8" fill="#f6f4ef"/>
+<text x="32" y="45" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="36" fill="#7a2335">§</text>
+</svg>
